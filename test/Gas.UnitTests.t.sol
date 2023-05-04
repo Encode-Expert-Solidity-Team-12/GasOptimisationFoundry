@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0; 
 
 import "forge-std/Test.sol";
-import "../../src/Gas.sol";
+import "../src/Gas.sol";
 
 contract GasTest is Test {
     GasContract public gas;
@@ -20,12 +20,14 @@ contract GasTest is Test {
         owner
     ];
 
+    //deploys contract from the owner's account
     function setUp() public {
         vm.startPrank(owner);
         gas = new GasContract(admins, totalSupply);
         vm.stopPrank();
     }
 
+    //checks that deployed contracts has the expected administrators
     function test_admins() public {
         for (uint8 i = 0; i < admins.length; ++i) {
             assertEq(admins[i], gas.administrators(i));
@@ -33,8 +35,9 @@ contract GasTest is Test {
     } 
 
     // addToWhitelist Tests
+        //Should only be callable by owner
     
-
+    //Checks addToWhiteList can't be called if not owner 
     function test_onlyOwner(address _userAddrs, uint256 _tier) public {
         vm.assume(_userAddrs != address(gas));
         _tier = bound( _tier, 1, 244);
@@ -42,6 +45,7 @@ contract GasTest is Test {
         gas.addToWhitelist(_userAddrs, _tier);
     }
 
+    //Checks addToWhiteList works if called by owner
     function test_tiers(address _userAddrs, uint256 _tier) public {
         vm.assume(_userAddrs != address(gas));
         _tier = bound( _tier, 1, 244);
@@ -50,12 +54,13 @@ contract GasTest is Test {
     }
 
     // Expect Event --> 
+    //Checks that addToWhiteList() emits event AddedToWhiteList with two values: user address and tier
     event AddedToWhitelist(address userAddress, uint256 tier);
     function test_whitelistEvents(address _userAddrs, uint256 _tier) public {
         vm.startPrank(owner);
         vm.assume(_userAddrs != address(gas));
         _tier = bound( _tier, 1, 244);
-        vm.expectEmit(true, true, false, true);
+        vm.expectEmit(true, true, false, true); //bools determines which event values are checked - in this case checks indexed params 0 (by default), 1 & 2 (first 2 bools), doesn't check indexed param 3, and checks the data (ie tier) 
         emit AddedToWhitelist(_userAddrs, _tier);
         gas.addToWhitelist(_userAddrs, _tier);
         vm.stopPrank();
@@ -66,6 +71,7 @@ contract GasTest is Test {
     //------------- Test whitelist Transfers -------------//
     //----------------------------------------------------//
 
+    //Checks that whiteTransfer() creates new entry in struct Payment[] with bool and amount
     function test_whitelistTransfer(
         address _recipient,
         address _sender,
@@ -77,12 +83,15 @@ contract GasTest is Test {
         vm.assume(_amount > 3);
         vm.assume(bytes(_name).length < 9 );
         _tier = bound( _tier, 1, 244);
+        //owner sends some tokens? to sender and adds sender to whitelist
         vm.startPrank(owner);
         gas.transfer(_sender, _amount, _name);
         gas.addToWhitelist(_sender, _tier);
         vm.stopPrank();
+        //sender transfers to recipient
         vm.prank(_sender);
         gas.whiteTransfer(_recipient, _amount);
+        //checks transaction has been added to payment struct
         (bool a, uint256 b) = gas.getPaymentStatus(address(_sender));
         console.log(a);
         assertEq(a, true);
