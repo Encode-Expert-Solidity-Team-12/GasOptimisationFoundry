@@ -21,6 +21,7 @@ contract GasTest is Test {
     ];
 
     //deploys contract from the owner's account
+    //REQUIRES CONSTRUCTOR THAT TAKES 2 PARAMETERS (address[] admins, uint256 totalSupply)
     function setUp() public {
         vm.startPrank(owner);
         gas = new GasContract(admins, totalSupply);
@@ -28,16 +29,15 @@ contract GasTest is Test {
     }
 
     //checks that deployed contracts has the expected administrators
+    //REQUIRES ARRAY administrators OF TYPE address[] - can be defined at onset if not modified in later tests
     function test_admins() public {
         for (uint8 i = 0; i < admins.length; ++i) {
             assertEq(admins[i], gas.administrators(i));
         }
     } 
-
-    // addToWhitelist Tests
-        //Should only be callable by owner
     
-    //Checks addToWhiteList can't be called if not owner 
+    //Checks addToWhiteList can't be called if not owner
+    //REQUIRES AddToWhitelist FUNCTION WHICH TAKES 2 PARAMETERS (address user, uint256 tier) AND RESTRICTED TO OWNER ONLY
     function test_onlyOwner(address _userAddrs, uint256 _tier) public {
         vm.assume(_userAddrs != address(gas));
         _tier = bound( _tier, 1, 244);
@@ -46,6 +46,7 @@ contract GasTest is Test {
     }
 
     //Checks addToWhiteList works if called by owner
+    //REQUIRES AddToWhitelist FUNCTION WHICH TAKES 2 PARAMETERS (address user, uint256 tier) AND RESTRICTED TO OWNER ONLY
     function test_tiers(address _userAddrs, uint256 _tier) public {
         vm.assume(_userAddrs != address(gas));
         _tier = bound( _tier, 1, 244);
@@ -54,7 +55,8 @@ contract GasTest is Test {
     }
 
     // Expect Event --> 
-    //Checks that addToWhiteList() emits event AddedToWhiteList with two values: user address and tier
+    //Checks that addToWhiteList() emits event AddedToWhiteList with correct values
+    //REQUIRES AddToWhitelist FUNCTION TO EMIT AddedToWhitelist EVENT WITH 2 PARAMETERS (address user, uint256 tier)
     event AddedToWhitelist(address userAddress, uint256 tier);
     function test_whitelistEvents(address _userAddrs, uint256 _tier) public {
         vm.startPrank(owner);
@@ -72,6 +74,12 @@ contract GasTest is Test {
     //----------------------------------------------------//
 
     //Checks that whiteTransfer() creates new entry in struct Payment[] with bool and amount
+    //REQUIRES 
+        //balanceOf FUNCTION WHICH TAKES 1 PARAMETER (address user) AND RETURNS UINT256 balance
+        //transfer FUNCTION WHICH TAKES 3 PARAMETERS (address recipient, uint256 amount, string name)
+        //addToWhitelist FUNCTION WHICH TAKES 2 PARAMETERS (address user, uint256 tier)
+        //whiteTransfer FUNCTION WHICH TAKES 2 PARAMETERS (address recipient, uint256 amount)
+        //getPaymentStatus FUNCTION WHICH TAKES 1 PARAMETER (address sender) AND RETURNS 2 VALUES (bool status, uint256 amount)
     function test_whitelistTransfer(
         address _recipient,
         address _sender,
@@ -91,14 +99,15 @@ contract GasTest is Test {
         //sender transfers to recipient
         vm.prank(_sender);
         gas.whiteTransfer(_recipient, _amount);
-        //checks transaction has been added to payment struct
+        //checks getPaymentStatus returns the correct values
         (bool a, uint256 b) = gas.getPaymentStatus(address(_sender));
         console.log(a);
         assertEq(a, true);
         assertEq(b, _amount);
     }
 
-    // Reverts if teirs out of bounds
+    // Reverts if teirs out of bounds (> 254)
+    // REQUIRES addToWhitelist function WHICH TAKES 2 PARAMETERS (address user, uint256 tier). UINT256 tier RESTRICTED TO <= 254
     function test_tiersReverts(address _userAddrs, uint256 _tier) public {
         vm.assume(_userAddrs != address(gas));
         vm.assume(_tier > 254);
@@ -108,6 +117,12 @@ contract GasTest is Test {
     }
 
     // Expect Event --> 
+    //Checks that whiteTransfer() emits event WhiteListTransfer with one value: recipient address
+    //REQUIRES
+        //balanceOf FUNCTION WHICH TAKES 1 PARAMETER (address user) AND RETURNS UINT256 balance
+        //transfer FUNCTION WHICH TAKES 3 PARAMETERS (address recipient, uint256 amount, string name)
+        //addToWhitelist function WHICH TAKES 2 PARAMETERS (address user, uint256 tier)
+        //whiteTransfer WHICH TAKES 2 PARAMETERS (address recipient, uint256 amount) AND EMITS EVENT WhitelistTransfer WITH 1 PARAMETER (address recipient)
     event WhiteListTransfer(address indexed);
     function test_whitelistEvents(
         address _recipient,
@@ -140,6 +155,15 @@ contract GasTest is Test {
         */
 
     // check balances update 
+    //REQUIRES
+        //balances[] MAPPING OF USER ADDRESS TO BALANCE
+        //whitelist[] MAPPING OF USER ADDRESS TO WHITELIST AMOUNT - test should work without writing anything to it in contract
+        //balanceOf FUNCTION WHICH TAKES 1 PARAMETER (address user) AND RETURNS UINT256 balance
+        //transfer FUNCTION WHICH TAKES 3 PARAMETERS (address recipient, uint256 amount, string name)
+        //addToWhitelist function WHICH TAKES 2 PARAMETERS (address user, uint256 tier)
+        //whiteTransfer WHICH TAKES 2 PARAMETERS (address recipient, uint256 amount) AND UPDATES THE balances[] MAPPING AS FOLLOWS:
+            // AT SENDER ADDRESS: DEDUCTS BALANCE BY AMOUNT TRANSFERED AND ADDS SENDER WHITELIST AMOUNT
+            // AT RECIPIENT ADDRESS: ADDS BALANCE BY AMOUNT TRANSFERED AND DEDUCTS SENDER WHITELIST AMOUNT
     function testWhiteTranferAmountUpdate(
         address _recipient,
         address _sender,
