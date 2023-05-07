@@ -69,7 +69,7 @@ EG: `forge test --match-test test_onlyOwner -vvvv`
 
 - [ ] avoid repetitive checks (understand logic and flow of code)
 - [ ] avoid public variables if you dont need getters
-- [ ] for all public function, input parameters are copied to memory automatically - if a function can be only
+- [x] for all public function, input parameters are copied to memory automatically - if a function can be only
   external (not public), make it external - this way parameters are read from calldata directly
 - [ ] order of the function affects cost when calling a function - move often called functions at the beginning (not
   order in code, but order of function hash - function selector) -

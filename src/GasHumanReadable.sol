@@ -2,12 +2,12 @@
 pragma solidity 0.8.19;
 
 contract GasContract {
-    address _owner;
+    address private immutable _owner;
     mapping(address => uint256) public balances;
     mapping(address => uint256) public whitelist;
     address[5] public administrators;
 
-    mapping(address => uint256) public whiteListStruct;
+    mapping(address => uint256) private whiteListStruct;
 
     event AddedToWhitelist(address userAddress, uint256 tier);
     event WhiteListTransfer(address indexed);
@@ -37,7 +37,7 @@ contract GasContract {
         }
     }
 
-    function checkForAdmin(address _user) public view returns (bool admin_) {
+    function checkForAdmin(address _user) private view returns (bool admin_) {
         for (uint256 ii; ii < administrators.length; ii++) {
             if (administrators[ii] == _user) {
                 admin_ = true;
@@ -46,7 +46,7 @@ contract GasContract {
         admin_ = false;
     }
 
-    function balanceOf(address _user) public view returns (uint256 balance_) {
+    function balanceOf(address _user) external view returns (uint256 balance_) {
         balance_ = balances[_user];
     }
 
@@ -54,7 +54,7 @@ contract GasContract {
         address _recipient,
         uint256 _amount,
         string calldata _name
-    ) public returns (bool status) {
+    ) external returns (bool status) {
         require(
             balances[msg.sender] >= _amount,
             "Insufficient Balance"
@@ -65,7 +65,7 @@ contract GasContract {
     }
 
     function addToWhitelist(address _userAddrs, uint256 _tier)
-        public
+        external
         onlyAdminOrOwner
     {
         require( _tier < 255, "tier greater than 255");
@@ -76,7 +76,7 @@ contract GasContract {
     function whiteTransfer(
         address _recipient,
         uint256 _amount
-    ) public checkIfWhiteListed() {
+    ) external checkIfWhiteListed() {
         require(
             _amount > 3,
             "amount less than 3"
@@ -98,7 +98,7 @@ contract GasContract {
     }
 
 
-    function getPaymentStatus(address sender) public view returns (bool biggerThan0, uint256 val) {
+    function getPaymentStatus(address sender) external view returns (bool biggerThan0, uint256 val) {
         val = whiteListStruct[sender];
         biggerThan0 = val > 0;
     }
