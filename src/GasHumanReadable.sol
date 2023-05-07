@@ -13,7 +13,7 @@ contract GasContract {
     event WhiteListTransfer(address indexed);
 
     modifier onlyAdminOrOwner() {
-        require(checkForAdmin(msg.sender) || _owner == msg.sender, "Caller not admin");
+        require(_owner == msg.sender || checkForAdmin(msg.sender), "Caller not admin");
         _;
     }
 
@@ -80,13 +80,15 @@ contract GasContract {
         uint256 _amount
     ) public checkIfWhiteListed() {
         require(
-            balances[msg.sender] >= _amount,
-            "Insufficient Balance"
-        );
-        require(
             _amount > 3,
             "amount less than 3"
         );
+
+        require(
+            balances[msg.sender] >= _amount,
+            "Insufficient Balance"
+        );
+
 
         whiteListStruct[msg.sender] = _amount;
         balances[msg.sender] -= _amount;
