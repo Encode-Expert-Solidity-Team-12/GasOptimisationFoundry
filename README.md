@@ -31,15 +31,15 @@ EG: `forge test --match-test test_onlyOwner -vvvv`
 
 ### Loops
 
-- [ ] break out of loops as soon as possible
-- [ ] use fixed size array if length is known
-- [ ] don't use storage variables in loops
-- [ ] avoid unbounded loops
-- [ ] don't use loop if not necessary. Can you predict the values without loop?
+- [x] break out of loops as soon as possible
+- [x] use fixed size array if length is known
+- [x] don't use storage variables in loops
+- [x] avoid unbounded loops
+- [x] don't use loop if not necessary. Can you predict the values without loop?
 
 ### Variables
 
-- [ ] dont initialize variables to default value (not needed)
+- [x] dont initialize variables to default value (not needed)
 - [ ] correctly order || and &&, so that low cost is executed first and high cost operation not executed if not
   necessary
 
