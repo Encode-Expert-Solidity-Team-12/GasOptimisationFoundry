@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.0;
+pragma solidity 0.8.19;
 
 contract GasContract {
     address _owner;
     mapping(address => uint256) public balances;
     mapping(address => uint256) public whitelist;
     address[5] public administrators;
-
 
     mapping(address => uint256) public whiteListStruct;
 

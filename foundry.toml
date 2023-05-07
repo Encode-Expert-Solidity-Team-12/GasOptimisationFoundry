@@ -3,5 +3,7 @@ src = 'src'
 out = 'out'
 libs = ['lib']
 
+optimizer_runs = 100 # The amount of optimizer runs to perform.
+via_ir = true # changes compilation pipeline to go through the new IR optimizer. See: https://docs.soliditylang.org/en/v0.8.17/ir-breaking-changes.html
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
