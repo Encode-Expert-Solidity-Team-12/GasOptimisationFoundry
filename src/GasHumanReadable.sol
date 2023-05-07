@@ -9,7 +9,7 @@ contract GasContract {
 
     mapping(address => uint256) private whiteListStruct;
 
-    event AddedToWhitelist(address userAddress, uint256 tier);
+    event AddedToWhitelist(address indexed userAddress, uint256 indexed tier);
     event WhiteListTransfer(address indexed);
 
     modifier onlyAdminOrOwner() {
