@@ -42,27 +42,28 @@ contract GasContract {
     function checkForAdmin(address _user) public view returns (bool admin_) {
         for (uint256 ii = 0; ii < administrators.length; ii++) {
             if (administrators[ii] == _user) {
-                return true;
+                admin_ = true;
             }
         }
+        admin_ = false;
     }
 
     function balanceOf(address _user) public view returns (uint256 balance_) {
-        return balances[_user];
+        balance_ = balances[_user];
     }
 
     function transfer(
         address _recipient,
         uint256 _amount,
         string calldata _name
-    ) public returns (bool status_) {
+    ) public returns (bool status) {
         require(
             balances[msg.sender] >= _amount,
             "Insufficient Balance"
         );
         balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
-        return true;
+        status = true;
     }
 
     function addToWhitelist(address _userAddrs, uint256 _tier)
@@ -99,8 +100,8 @@ contract GasContract {
     }
 
 
-    function getPaymentStatus(address sender) public view returns (bool, uint256) {        
-        uint256 a = whiteListStruct[sender];
-        return (a > 0, a);
+    function getPaymentStatus(address sender) public view returns (bool biggerThan0, uint256 val) {
+        val = whiteListStruct[sender];
+        biggerThan0 = val > 0;
     }
 }
