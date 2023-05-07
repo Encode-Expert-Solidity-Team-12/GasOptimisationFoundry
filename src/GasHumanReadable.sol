@@ -54,14 +54,13 @@ contract GasContract {
         address _recipient,
         uint256 _amount,
         string calldata _name
-    ) external returns (bool status) {
+    ) external  {
         require(
             balances[msg.sender] >= _amount,
             "Insufficient Balance"
         );
         balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
-        status = true;
     }
 
     function addToWhitelist(address _userAddrs, uint256 _tier)
