@@ -40,7 +40,7 @@ EG: `forge test --match-test test_onlyOwner -vvvv`
 ### Variables
 
 - [x] dont initialize variables to default value (not needed)
-- [ ] correctly order || and &&, so that low cost is executed first and high cost operation not executed if not
+- [x] correctly order || and &&, so that low cost is executed first and high cost operation not executed if not
   necessary
 
 ### Storage
@@ -69,8 +69,6 @@ EG: `forge test --match-test test_onlyOwner -vvvv`
 
 - [ ] avoid repetitive checks (understand logic and flow of code)
 - [ ] avoid public variables if you dont need getters
-- [ ] reduce number of parameters - pack parameters to one parameter called data. In code you have to unpack them (
-  additional computation)
 - [ ] for all public function, input parameters are copied to memory automatically - if a function can be only
   external (not public), make it external - this way parameters are read from calldata directly
 - [ ] order of the function affects cost when calling a function - move often called functions at the beginning (not
@@ -93,7 +91,8 @@ EG: `forge test --match-test test_onlyOwner -vvvv`
 - [ ] k + unindexedBytes * a + indexedTopics * b  (k = 375, a = 8, b = 375)
 
 ### Advanced
-
+- [ ] reduce number of function parameters - pack parameters to one parameter called data. In code you have to unpack them (
+  additional computation)
 - [ ] store data in events if possible (if you wont ever need it in the contract - timestamping) because it is cheaper
   than
   in storage

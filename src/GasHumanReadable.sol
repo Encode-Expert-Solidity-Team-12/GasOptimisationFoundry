@@ -69,9 +69,7 @@ contract GasContract {
         onlyAdminOrOwner
     {
         require( _tier < 255, "tier greater than 255");
-        uint256 tier = _tier;
-        if(tier > 3) tier = 3;
-        whitelist[_userAddrs] = tier;
+        whitelist[_userAddrs] = _tier > 3 ? 3 : _tier;
         emit AddedToWhitelist(_userAddrs, _tier);
     }
 
@@ -95,7 +93,7 @@ contract GasContract {
         balances[_recipient] += _amount;
         balances[msg.sender] += whitelist[msg.sender];
         balances[_recipient] -= whitelist[msg.sender];
-        
+
         emit WhiteListTransfer(_recipient);
     }
 
